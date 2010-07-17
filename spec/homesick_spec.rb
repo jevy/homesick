@@ -68,4 +68,24 @@ describe Homesick do
     end
 
   end
+
+  describe 'track' do
+    it "should move and symlink a file" do
+      #require 'ruby-debug'
+      @user_dir.file '.fakerc'
+      repo_dir = @user_dir.directory '.homesick/repos/somecastle/home'
+
+      @homesick.should_receive(:git_add).with(repo_dir + '.fakerc')
+      #debugger
+      @homesick.track(@user_dir + '.fakerc', 'somecastle')
+      File.symlink?(@user_dir + '.fakerc').should be true
+      File.exist?(repo_dir + '.fakerc').should be true
+
+      repo_dir.destroy!
+    end
+
+    it "should move and symlink a directory"
+    it "should produce an error if the file doesn't exist"
+
+  end
 end

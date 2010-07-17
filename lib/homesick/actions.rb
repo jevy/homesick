@@ -59,6 +59,11 @@ class Homesick
       system "git pull --quiet" unless options[:pretend]
     end
 
+    def git_add(file, config = {})
+      say_status 'git add', '', :green unless options[:quiet]
+      system "git add #{file}"
+    end
+
     def ln_s(source, destination, config = {})
       source = Pathname.new(source)
       destination = Pathname.new(destination)

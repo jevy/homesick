@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'thor'
 
 class Homesick < Thor
@@ -103,6 +104,13 @@ class Homesick < Thor
 
       empty_directory "home"
     end
+  end
+
+  desc "track <file/dir>", "add a file or directory you'd like to track"
+  def track(filename, castlename)
+    FileUtils.mv filename, castle_dir(castlename)
+    ln_s castle_dir(castlename) + File.basename(filename), filename
+    git_add(castle_dir(castlename) + File.basename(filename))
   end
 
   protected
