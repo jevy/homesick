@@ -70,22 +70,49 @@ describe Homesick do
   end
 
   describe 'track' do
-    it "should move and symlink a file" do
-      #require 'ruby-debug'
-      @user_dir.file '.fakerc'
-      repo_dir = @user_dir.directory '.homesick/repos/somecastle/home'
 
-      @homesick.should_receive(:git_add).with(repo_dir + '.fakerc')
-      #debugger
-      @homesick.track(@user_dir + '.fakerc', 'somecastle')
-      File.symlink?(@user_dir + '.fakerc').should be true
-      File.exist?(repo_dir + '.fakerc').should be true
-
-      repo_dir.destroy!
+    before(:each) do
+      @repo_dir = @user_dir.directory '.homesick/repos/somecastle/home'
     end
 
-    it "should move and symlink a directory"
-    it "should produce an error if the file doesn't exist"
+    after(:each) do
+      @repo_dir.destroy!
+    end
+
+    it "should move and symlink a file" do
+      @user_dir.file '.fakerc'
+
+      @homesick.should_receive(:git_add).with('.fakerc')
+      @homesick.track(@user_dir + '.fakerc', 'somecastle')
+      File.symlink?(@user_dir + '.fakerc').should be true
+      File.exist?(@repo_dir + '.fakerc').should be true
+    end
+
+    it "should move and symlink a directory" do
+      @user_dir.directory '.somedir'
+
+      @homesick.should_receive(:git_add).with('.somedir')
+      @homesick.track(@user_dir + '.somedir', 'somecastle')
+      File.symlink?(@user_dir + '.somedir').should be true
+      File.exist?(@repo_dir + '.somedir').should be true
+    end
 
   end
+
+  describe 'commit' do
+    it "should commit the castle" do
+      repo_dir = @user_dir.directory '.homesick/repos/somecastle/home'
+      @homesick.should_receive(:git_commit).with('my commit')
+      @homesick.commit('somecastle', 'my commit')
+    end
+  end
+
+  describe 'push' do
+    it "should push to the repo" do
+      repo_dir = @user_dir.directory '.homesick/repos/somecastle/home'
+      @homesick.should_receive(:git_push)
+      @homesick.push('somecastle')
+    end
+  end
+
 end

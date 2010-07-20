@@ -106,11 +106,32 @@ class Homesick < Thor
     end
   end
 
-  desc "track <file/dir>", "add a file or directory you'd like to track"
+  desc "track <file/dir> <castle>", "add a file or directory you'd like to track"
   def track(filename, castlename)
-    FileUtils.mv filename, castle_dir(castlename)
-    ln_s castle_dir(castlename) + File.basename(filename), filename
-    git_add(castle_dir(castlename) + File.basename(filename))
+    check_castle_existance(castlename, "track")
+
+    move_and_link(filename, castle_dir(castlename))
+    inside castle_dir(castlename) do
+      git_add(File.basename(filename))
+    end
+  end
+
+  desc "commit NAME <message>", 'commit the castle to the repo'
+  def commit(castlename, message)
+    check_castle_existance(castlename, "commit")
+
+    inside repos_dir.join(castlename) do
+      git_commit message
+    end
+  end
+
+  desc "push NAME", "Update the specified castle"
+  def push(castlename)
+    check_castle_existance(castlename, "push")
+
+    inside castle_dir(castlename) do
+      git_push
+    end
   end
 
   protected

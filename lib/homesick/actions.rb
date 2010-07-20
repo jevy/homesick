@@ -61,7 +61,22 @@ class Homesick
 
     def git_add(file, config = {})
       say_status 'git add', '', :green unless options[:quiet]
-      system "git add #{file}"
+      system "git add #{file}" unless options[:pretend]
+    end
+
+    def git_commit(message)
+      say_status 'git commit', '', :green unless options[:quiet]
+      system "git commit -m #{message}" unless options[:pretend]
+    end
+    
+    def git_push(config = {})
+      say_status 'git push', '', :green unless options[:quiet]
+      system "git push origin --quiet" unless options[:pretend]
+    end
+
+    def move_and_link(file, dest_dir)
+      FileUtils.mv file, dest_dir
+      ln_s dest_dir + File.basename(file), file
     end
 
     def ln_s(source, destination, config = {})
